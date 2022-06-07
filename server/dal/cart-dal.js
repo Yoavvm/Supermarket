@@ -1,12 +1,17 @@
-const { Cart } = require('../db/models');
+const { Cart, Item } = require('../db/models');
 
-const getCartByUserId = async (id) => {
-    const cart = await Cart.find({ userId: id });
-    return cart;
+const getCartByUserId = async (userId) => {
+    let [cart] = await Cart.find({userId , isComplete: false })
+    if(!cart) {
+        await createCart(userId);
+        [cart] = await Cart.find({userId , isComplete: false })
+    }
+    const cartItems = await Item.find({ cart: cart._id});
+    return {cartItems, cart};
 }
 
-const createCart = async (id) => {
-    const newCart = await Cart({id});
+const createCart = async (userId) => {
+    const newCart = await Cart({userId});
     await newCart.save()
 
     return newCart._id;

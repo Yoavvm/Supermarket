@@ -2,8 +2,8 @@ const itemLogic = require('../logic/item-logic');
 
 const addItem = async (req, res) => {
     try {
-        await itemLogic.addItem(req.body);
-        res.json({ error: false, msg:'successful added item' });
+        const cart = await itemLogic.addItem(req.body);
+        res.json(cart);
     } catch (error) {
         res.status(500).json({ error, msg: error.message });
     }

@@ -1,6 +1,12 @@
 const itemDal = require('../dal/item-dal');
 
-const addItem = async (payload) => await itemDal.addItem(payload);
+const addItem = async (payload) => {
+    const isItemInCart = await itemDal.findItemInCart(payload);
+    (isItemInCart) ? await updateItem(payload) : await itemDal.addItem(payload);
+
+    const cart = await getItemsByCartId(payload.cartId)
+    return cart;
+}
 
 const getItemsByCartId = async (cartId) => {
     const cart = await itemDal.getItemsByCartId(cartId);

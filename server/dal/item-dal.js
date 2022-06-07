@@ -2,19 +2,33 @@ const { Item } = require('../db/models');
 
 const addItem = async (payload) => {
     const newItem = await Item(payload);
-    await newItem.save()
+    await newItem.save();
 }
 const getItemsByCartId = async (cartId) => {
-    const cart = await Item.find({cartId: cartId});
+    const cart = await Item.find({ cartId });
     return cart;
 }
 
 const updateItem = async (payload) => {
-    await Item.findOneAndUpdate({ productId: payload.productId, cartId: payload.cartId }, { quantity: payload.quantity} )
+    const { quantity, productId, cartId } = payload
+
+    if (quantity) {
+        await Item.findOneAndUpdate({ productId, cartId }, { quantity });
+        return
+    }
+    
+    await Item.findOneAndRemove({ productId, cartId });
 }
 
 const deleteItem = async (payload) => {
-    await Item.findOneAndRemove({ productId: payload.productId, cartId: payload.cartId})
+    await Item.findOneAndRemove({ productId: payload.productId, cartId: payload.cartId })
+}
+
+const findItemInCart = async (payload) => {
+    const {productId, cartId} = payload;
+
+    const [isItemExist] = await Item.find({productId, cartId});
+    return !!isItemExist;
 }
 
 module.exports = {
@@ -22,4 +36,5 @@ module.exports = {
     getItemsByCartId,
     updateItem,
     deleteItem,
+    findItemInCart,
 }
